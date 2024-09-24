@@ -66,10 +66,10 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Maven 종속성 파일 및 프로젝트 파일 복사
-COPY demo/mvnw ./
-COPY demo/.mvn .mvn
-COPY demo/pom.xml ./
-COPY demo/src ./src
+COPY mvnw ./
+COPY .mvn .mvn
+COPY pom.xml ./
+COPY src ./src
 RUN chmod +x mvnw && ./mvnw dependency:go-offline
 
 # 필요한 의존성 다운로드 및 패키징
@@ -78,37 +78,39 @@ RUN ./mvnw clean package -DskipTests
 # 빌드된 JAR 파일 실행
 CMD ["java", "-jar", "/app/target/*.jar"]
 ```
+**최적화 전 빌드 시간:** 105.4s<br>
+**최적화 전 이미지 크기:** 539MB
+![image](https://github.com/user-attachments/assets/9b0e4401-623a-4f1b-8527-a6c028a3ba01)
+
 
 <br> 
 
 ## 1️⃣ Optimization 1. Multi-stage build
 ```
 # 첫 번째 스테이지: 빌드 환경
-FROM eclipse-temurin:17-jdk-jammy AS builder
-
-WORKDIR /app
-
-# Maven 종속성 파일 복사 및 의존성 다운로드
-COPY demo/mvnw ./mvnw
-COPY demo/.mvn .mvn
-COPY demo/pom.xml ./
+FROM openjdk:17-jdk-slim AS build-env
+WORKDIR /opt/app
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
 RUN chmod +x mvnw && ./mvnw dependency:go-offline
+RUN ./mvnw dependency:go-offline
+COPY ./src ./src
+RUN ./mvnw clean install
 
-# 소스 코드 복사 및 빌드
-COPY demo/src ./src
-RUN ./mvnw clean package -DskipTests
-
-# 두 번째 스테이지: 실행 환경 (Distroless)
-FROM gcr.io/distroless/java17-debian11
-
-WORKDIR /app
-
-# 빌드된 JAR 파일만 복사
-COPY --from=builder /app/target/*.jar /app/app.jar
-
-# 애플리케이션 실행
-CMD ["java", "-jar", "/app/app.jar"]
+# 두번째 스테이지 : 실행 환경
+FROM gcr.io/distroless/java17-debian12
+WORKDIR /opt/app
+EXPOSE 8080
+COPY --from=build-env /opt/app/target/*.jar /opt/app/app.jar
+CMD ["app.jar"]
 ```
+**최적화 후 빌드 시간:** 81.9s<br>
+**최적화 후 이미지 크기:** 245MB
+![2024-09-24 23 52 07](https://github.com/user-attachments/assets/cbac30f9-912f-40bf-8978-fe5b86aba6f9)
+![2024-09-24 23 53 49](https://github.com/user-attachments/assets/ce9d32c2-8107-4276-b21e-0c008c803bf9)
+
+<br>
+
 ✨ **베이스 이미지로 Distroless를 사용하는 이유**
 - **최소한의 실행 환경**: 운영 환경에서 불필요한 패키지와 도구들이 없기 때문에 이미지 크기가 매우 작고, 보안적인 장점이 큽니다.
 - **JRE만 포함**: Distroless는 JDK가 아닌 JRE만 포함하므로, 애플리케이션을 실행하기 위한 최소한의 Java 환경을 제공합니다.
@@ -117,34 +119,41 @@ CMD ["java", "-jar", "/app/app.jar"]
 ## 2️⃣ Optimization 2. .dockerignore 적용
 ```
 # .dockerignore
-target/
+.idea
 .git
 .gitignore
-README.md
+.dockerignore
 Dockerfile
-Dockerfile.slim
-mvnw
-mvnw.cmd
-pom.xml
+*.md
+*.sh
+*.yml
+scripts
 ```
+<br>
 
+- **이미지크기 감소 및 보안강화**: 불필요한 파일을 이미지에서 제외하고 이미지 크기를 줄이고, 민감정보가 담긴 파일들을 사전에 제외함으로써 보안사고를 예방할 수 있습니다.
 <br>
 
 ## 3️⃣ Optimization 3. Docker Slim (압축 도구) 실행
 ```
 # Docker Slim 설치
-curl -sL https://downloads.dockersl.im/install.sh | sudo -E bash -
+wget https://github.com/slimtoolkit/slim/releases/download/1.40.11/dist_linux.tar.gz
+tar -xvf ds.tar.gz
+mv  dist_linux/slim /usr/local/bin/
+mv  dist_linux/slim-sensor /usr/local/bin/
 
 # 최적화 실행
-docker-slim build --target spring-boot-app:latest --output spring-boot-app-slim
+docker-slim build --tag spring_optimization:2.0 spring_optimization:1.0
 ```
 <br>
 
-## 🎨 실행 결과
+## 🎨 최종 실행 결과
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/d1bfa229-ecc2-45ad-be18-5b168ec49402" width="500">
+<img src="https://github.com/user-attachments/assets/d7cfb060-e189-4201-b78b-1bdccc715009" width="500">
 <p>최적화 전과 후 도커 이미지 파일의 크기를 비교한 이미지입니다.</p>
+<img src="https://github.com/user-attachments/assets/2fb1f921-cb4c-4267-ba4a-575a4e7040f1" width="500">
+<p>이미지 크기가 줄어도 서비스는 정상적으로 동작한다.</p>
 </div>
 
 <br>
