@@ -21,7 +21,7 @@
 ## 0️⃣ 0. 실습 환경 준비
 ### 1. [Spring Initializr](https://start.spring.io/)에서 demo 애플리케이션 생성
 <div align="center">
-<img src="https://github.com/user-attachments/assets/a1110ec6-1aff-4ea8-a33c-0c14c6507c3b" width="600">
+<img src="https://github.com/user-attachments/assets/a1110ec6-1aff-4ea8-a33c-0c14c6507c3b" width="700">
 </div>
 <br> 
 <div align="center">
@@ -119,7 +119,7 @@ docker-slim build --target spring-boot-app:latest --output spring-boot-app-slim
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/d1bfa229-ecc2-45ad-be18-5b168ec49402" width="500">
-<p>Multi-stage build 전과 후 도커 이미지 파일의 크기를 비교한 이미지입니다.</p>
+<p>최적화 전과 후 도커 이미지 파일의 크기를 비교한 이미지입니다.</p>
 </div>
 
 <br>
