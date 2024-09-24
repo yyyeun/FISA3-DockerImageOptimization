@@ -1,0 +1,10 @@
+# .dockerignore
+target/
+.git
+.gitignore
+README.md
+Dockerfile
+Dockerfile.slim
+mvnw
+mvnw.cmd
+pom.xml
