@@ -24,12 +24,33 @@
 <img src="https://github.com/user-attachments/assets/a1110ec6-1aff-4ea8-a33c-0c14c6507c3b" width="700">
 </div>
 <br> 
+
+```
+curl https://start.spring.io/starter.zip \
+  -d dependencies=web \
+  -d type=maven-project \
+  -d language=java \
+  -d bootVersion=3.3.4 \
+  -d groupId=com.example \
+  -d artifactId=demo \
+  -d name=demo \
+  -d description="Demo project for Spring Boot" \
+  -d packageName=com.example.demo \
+  -d packaging=jar \
+  -d javaVersion=17 \
+  -o springboot-app.zip
+```
+Spring Initializr 사이트 또는 `curl` 명령어로 프로젝트 생성
+
+<br>
 <div align="center">
 <img src="https://github.com/user-attachments/assets/9d404a86-c364-47c2-a843-55cc02f5464b" width="200">
+<p>생성된 프로젝트 구조</p>
 </div>
 <br>
 
-### 2. 테스트 서버를 생성
+
+### 2. 테스트 서버 생성
 <div align="center">
 <img src="https://github.com/user-attachments/assets/58d6a128-16b2-4c63-8bf3-4c550db37e53" width="600">
 </div>
@@ -111,6 +132,10 @@ pom.xml
 
 ## 3️⃣ Optimization 3. Docker Slim (압축 도구) 실행
 ```
+# Docker Slim 설치
+curl -sL https://downloads.dockersl.im/install.sh | sudo -E bash -
+
+# 최적화 실행
 docker-slim build --target spring-boot-app:latest --output spring-boot-app-slim
 ```
 <br>
