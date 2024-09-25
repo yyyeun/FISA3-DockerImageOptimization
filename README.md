@@ -153,7 +153,7 @@ docker-slim build --tag spring_optimization:2.0 spring_optimization:1.0
 <img src="https://github.com/user-attachments/assets/d7cfb060-e189-4201-b78b-1bdccc715009" width="500">
 <p>최적화 전과 후 도커 이미지 파일의 크기를 비교한 이미지입니다.</p>
 <img src="https://github.com/user-attachments/assets/2fb1f921-cb4c-4267-ba4a-575a4e7040f1" width="500">
-<p>이미지 크기가 줄어도 서비스는 정상적으로 동작한다.</p>
+<p>이미지 크기가 줄어도 서비스는 정상적으로 동작합니다..</p>
 </div>
 
 <br>
